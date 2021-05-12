@@ -39,6 +39,8 @@
 #include "sample_virvi2venc.h"
 #include "sample_virvi2venc_config.h"
 
+#include "SystemBase.h"
+
 //#define MAX_VIPP_DEV_NUM  2
 //#define MAX_VIDEO_NUM         MAX_VIPP_DEV_NUM
 //#define MAX_VIR_CHN_NUM   8
@@ -208,6 +210,9 @@ static ERRORTYPE loadSampleVirvi2VencConfig(SampleVirvi2VencConfig *pConfig, con
     return SUCCESS;
 }
 
+#include <stdio.h>
+#include <time.h>
+
 static void *GetEncoderFrameThread(void *pArg)
 {
     int ret = 0;
@@ -258,6 +263,11 @@ static void *GetEncoderFrameThread(void *pArg)
         }
         else
         {
+	    struct timespec ts;
+            timespec_get(&ts, TIME_UTC);
+	    //printf("PTS: %lli, now: %lli\r\n", CDX_GetSysTimeUsMonotonic());
+            
+
             if(VencFrame.mpPack != NULL && VencFrame.mpPack->mLen0)
             {
                 fwrite(VencFrame.mpPack->mpAddr0,1,VencFrame.mpPack->mLen0, gpSampleVirvi2VencContext->mOutputFileFp);
@@ -376,8 +386,12 @@ int main(int argc, char *argv[])
             pContext->mVEncChnAttr.VeAttr.AttrH264e.bByFrame = TRUE;
             pContext->mVEncChnAttr.VeAttr.AttrH264e.PicWidth = pContext->mConfigPara.DestWidth;
             pContext->mVEncChnAttr.VeAttr.AttrH264e.PicHeight = pContext->mConfigPara.DestHeight;
-            pContext->mVEncChnAttr.VeAttr.AttrH264e.mLevel = H264_LEVEL_51;
-            pContext->mVEncChnAttr.VeAttr.AttrH264e.mbPIntraEnable = TRUE;
+            //pContext->mVEncChnAttr.VeAttr.AttrH264e.mLevel = H264_LEVEL_51;
+            pContext->mVEncChnAttr.VeAttr.AttrH264e.mLevel = H264_LEVEL_41;
+            //pContext->mVEncChnAttr.VeAttr.AttrH264e.mbPIntraEnable = TRUE;
+            pContext->mVEncChnAttr.VeAttr.AttrH264e.mbPIntraEnable = FALSE;
+	    //pContext->mVEncChnAttr.VeAttr.AttrH264e.FastEncFlag = TRUE;
+            pContext->mVEncChnAttr.VeAttr.AttrH264e.FastEncFlag = FALSE;
             pContext->mVEncChnAttr.RcAttr.mRcMode = VENC_RC_MODE_H264CBR;
             pContext->mVEncChnAttr.RcAttr.mAttrH264Cbr.mBitRate = pContext->mConfigPara.DestBitRate;
             pContext->mVEncChnAttr.RcAttr.mAttrH264Cbr.mMaxQp = 51;
@@ -391,6 +405,7 @@ int main(int argc, char *argv[])
             pContext->mVEncChnAttr.VeAttr.AttrH265e.mPicHeight = pContext->mConfigPara.DestHeight;
             pContext->mVEncChnAttr.VeAttr.AttrH265e.mLevel = H265_LEVEL_62;
             pContext->mVEncChnAttr.VeAttr.AttrH265e.mbPIntraEnable = TRUE;
+	    pContext->mVEncChnAttr.VeAttr.AttrH265e.mFastEncFlag = TRUE;
             pContext->mVEncChnAttr.RcAttr.mRcMode = VENC_RC_MODE_H265CBR;
             pContext->mVEncChnAttr.RcAttr.mAttrH265Cbr.mBitRate = pContext->mConfigPara.DestBitRate;
             pContext->mVEncChnAttr.RcAttr.mAttrH265Cbr.mMaxQp = 51;
