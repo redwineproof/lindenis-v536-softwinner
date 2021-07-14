@@ -3622,9 +3622,11 @@ static ERRORTYPE videoInputHw_GetData(int *pvipp_id, VIDEO_FRAME_INFO_S *pstFram
         video = gpVIDevManager->media->video_dev[ViCh];
     }
     if (video_wait_buffer(video, nMilliSec) < 0) {
+        printf("wait too long!\n");
         return FAILURE;
     }
     if (video_dequeue_buffer(video, &buffer) < 0) {
+         printf("error dequeue buffer!\n");
         return FAILURE;
     }
     memset(&vfmt, 0, sizeof(vfmt));
@@ -3790,7 +3792,7 @@ void * VideoInputHw_CapThread(void *pThreadData)
         // gpVIDevManager->gpVippManager[ViVipp]->mProcessStep = 2;
 		if (0 == videoInputHw_GetData(&vipp_id, &pstFrameInfo, nMilliSec)) { /* success : get yuv data */
 			// printf("addr = %p, vipp_id = %d.\r\n", pstFrameInfo.VFrame.mpVirAddr[0], vipp_id);
-			/*printf("VideoInputHw_CapThread:%d,%d,%d,%d;%d,%d",
+			/*printf("VideoInputHw_CapThread:%d,%d,%d,%d;%d,%d\n",
 				pstFrameInfo.VFrame.mOffsetTop,
 				pstFrameInfo.VFrame.mOffsetLeft,
 				pstFrameInfo.VFrame.mOffsetRight,

@@ -435,10 +435,12 @@ int video_wait_buffer(struct isp_video_device *video, int timeout)
 	r = select(video->entity->fd + 1, &fds, NULL, NULL, &tv);
 
 	if (-1 == r) {
+		printf("%s video%d select error\n", video->entity->devname, video->id);
 		ISP_ERR("video%d select error!\n", video->id);
 		return -1;
 	}
 	if (0 == r) {
+		printf("%s video%d select timeout\n", video->entity->devname, video->id);
 		ISP_ERR("video%d select timeout!\n", video->id);
 		return -1;
 	}

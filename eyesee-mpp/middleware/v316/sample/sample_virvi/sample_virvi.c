@@ -168,7 +168,7 @@ static void *GetCSIFrameThread(void *pArg)
     {
         if ((ret = AW_MPI_VI_GetFrame(ViDev, ViCh, &pCap->pstFrameInfo, pCap->s32MilliSec)) != 0)
         {
-            // printf("VI Get Frame failed!\n");
+            printf("VI Get Frame failed!\n");
             continue ;
         }
         i++;
@@ -196,6 +196,23 @@ static void *GetCSIFrameThread(void *pArg)
             fclose(fd);
 #endif
         }
+
+        FILE *fd;
+        char filename[128];
+        sprintf(filename, "/tmp/%dx%d_%d.yuv",
+            pCap->pstFrameInfo.VFrame.mWidth,
+            pCap->pstFrameInfo.VFrame.mHeight,
+            i);
+        fd = fopen(filename, "wb+");
+        fwrite(pCap->pstFrameInfo.VFrame.mpVirAddr[0],
+                pCap->pstFrameInfo.VFrame.mWidth * pCap->pstFrameInfo.VFrame.mHeight,
+                1, fd);
+        fwrite(pCap->pstFrameInfo.VFrame.mpVirAddr[1],
+                pCap->pstFrameInfo.VFrame.mWidth * pCap->pstFrameInfo.VFrame.mHeight >> 1,
+                1, fd);
+        fclose(fd);
+
+
         AW_MPI_VI_ReleaseFrame(ViDev, ViCh, &pCap->pstFrameInfo);
         j++;
     }
